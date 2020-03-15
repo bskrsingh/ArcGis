@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no">
+    <title>ArcGIS JavaScript Tutorials: Create a JavaScript starter app</title>
+    <link rel="stylesheet" href="https://js.arcgis.com/4.14/esri/themes/light/main.css">
+    <script src="https://js.arcgis.com/4.14/"></script>
+    <style>
+      html, body, #viewDiv {
+        padding: 0;
+        margin: 0;
+        height: 100%;
+        width: 100%;
+      }
+    </style>
+  </head>
+  <body>
+      <select id="myMAP" onclick="myFunction()">
+          <option value="topo">topo</option>
+          <option value="streets">streets</option>
+          <option value="satellite">satellite</option>
+          <option value="hybrid">hybrid</option>
+          <option value="terrain">terrain</option>
+          <option value="gray">gray</option>
+          <option value="dark-gray">dark-gray</option>
+          <option value="national-geographic">national-geographic</option>
+          <option value="osm">osm</option>
+          <option value="dark-gray-vector">dark-gray-vector</option>
+          <option value="gray-vector">gray-vector</option>
+          <option value="streets-vector">streets-vector</option>
+          <option value="topo-vector">topo-vector</option>
+          <option value="streets-night-vector">streets-night-vector</option>
+          <option value="streets-relief-vector">streets-relief-vector</option>
+          <option value="streets-navigation-vector">streets-navigation-vector</option>
+          <option value="oceans">oceans</option>
+      </select>
+
+      <select id="listServices"></select>
+
+    <div id="viewDiv"></div>
+    
+    <script>
+        var e;
+        var s;
+        e = document.getElementById("myMAP");
+        function myFunction(){
+         s = e.value;
+        }
+       myFunction()
+        let map;
+        let view;
+        require([
+            "esri/Map",
+            "esri/views/MapView",
+            "esri/views/SceneView",
+            "esri/request",
+            "esri/layers/MapImageLayer"
+          ], function(Map, MapView, SV, Request, MapLayer) {
+      
+          map = new Map({
+            basemap: "topo"
+          });
+        //   map2 = new Map({
+        //     basemap: {s}
+        //   });
+              
+        //   view = new MapView({
+        //     container: "viewDiv",
+        //     map: map,
+        //     center: [-98.78671448101505, 41.43444167377417], // longitude, latitude
+        //     zoom: 5
+        //   });
+        let viewOptions = {
+            container: "viewDiv",
+            map: map,
+            center: [-98.78671448101505, 41.43444167377417], // longitude, latitude
+            //zoom: 30
+            scale:10000
+        }
+
+        let layer = new MapLayer({url:"http://server.arcgisonline.com/arcgis/rest/services/NatGeo_World_Map/MapServer?f=pjson"});
+        map.add(layer);
+        let sceneView = new SV(viewOptions);
+        let url = "http://server.arcgisonline.com/arcgis/rest/services?f=pjson";
+        let options = {responseType: "json"};
+
+         Request(url,options).then(function(response){
+             let result = response.data;
+            let listServices = document.getElementById("listServices");
+             for(let i = 0; i< result.services.length;i++){
+                let option =  document.createElement("option");
+                option.textContent = result.services[i].name;
+                listServices.appendChild(option)
+               // alert(result.services[i].name)
+             }
+         })
+         });
+
+       
+        e.addEventListener("click",  function(){
+            map.basemap = s;
+        })
+        </script>
+  </body>
+</html>
